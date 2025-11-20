@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: choir-api
+
+  # Database Connection
+  datasource:
+    url: jdbc:postgresql://localhost:5433/choirdb
+    username: choir_user
+    password: secret
+    driver-class-name: org.postgresql.Driver
+
+  # Database Schema Migration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  # JPA / Hibernate Settings
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: validate # We use Flyway, so we tell Hibernate ONLY to validate
+    properties:
+      hibernate:
+        format_sql: true
+        # This helps Hibernate understand Postgres JSONB types
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+cloudinary:
+  url: ${CLOUDINARY_URL}
+
+# Server Port (Optional, default is 8080)
+server:
+  port: 8080
