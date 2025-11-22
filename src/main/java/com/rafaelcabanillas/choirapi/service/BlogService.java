@@ -26,6 +26,7 @@ public class BlogService {
     private final BlogPostRepository blogRepository;
     private final UserRepository userRepository;
     private final CloudinaryService cloudinaryService;
+    private final NotificationService notificationService;
 
     // --- READ ---
 
@@ -49,7 +50,6 @@ public class BlogService {
     public BlogPostDTO create(String title, Map<String, Object> content, boolean isPublic, MultipartFile file) throws IOException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        // 1. Fetch the full User entity
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -64,13 +64,26 @@ public class BlogService {
         BlogPost post = BlogPost.builder()
                 .title(title)
                 .content(content)
-                .author(user) // 2. Save the Entity, not the string
+                .author(user)
                 .isPublic(isPublic)
                 .imageUrl(url)
                 .imagePublicId(publicId)
                 .build();
 
-        return toDTO(blogRepository.save(post));
+        // 1. Save to DB
+        BlogPost savedPost = blogRepository.save(post);
+
+        // 2. --- NOTIFICATION TRIGGER ---
+        if (isPublic) {
+            try {
+                notificationService.broadcastNotification("Nueva Publicación en el Blog 📝", title);
+            } catch (Exception e) {
+                System.err.println("Error sending notification: " + e.getMessage());
+            }
+        }
+        // -----------------------------
+
+        return toDTO(savedPost);
     }
 
     @Transactional

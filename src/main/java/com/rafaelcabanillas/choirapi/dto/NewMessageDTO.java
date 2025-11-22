@@ -15,4 +15,6 @@ public class NewMessageDTO {
     private String filename;
     private String imageUrl;
     private String imagePublicId;
+
+    private Long replyToId;
 }

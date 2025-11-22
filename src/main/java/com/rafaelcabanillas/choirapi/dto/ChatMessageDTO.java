@@ -19,11 +19,20 @@ public class ChatMessageDTO {
     private String imageUrl;
     private List<ReactionDTO> reactions;
     private OffsetDateTime createdAt;
+    private ReplyPreviewDTO replyTo;
 
     @Data
     @Builder
     public static class ReactionDTO {
         private String emoji;
         private String username;
+    }
+
+    @Data
+    @Builder
+    public static class ReplyPreviewDTO {
+        private Long id;
+        private String username;
+        private String textPreview;
     }
 }

@@ -19,6 +19,7 @@ public class AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
     private final CloudinaryService cloudinaryService;
+    private final NotificationService notificationService;
 
     public List<AnnouncementDTO> getAll(boolean adminMode) {
         List<Announcement> list = adminMode
@@ -47,7 +48,22 @@ public class AnnouncementService {
                 .imagePublicId(publicId)
                 .build();
 
-        return toDTO(announcementRepository.save(entity));
+        // 1. Save to DB
+        Announcement savedEntity = announcementRepository.save(entity);
+
+        // 2. --- NOTIFICATION TRIGGER ---
+        // Only send if it is public!
+        if (isPublic) {
+            try {
+                notificationService.broadcastNotification("Nuevo Aviso 📢", title);
+            } catch (Exception e) {
+                // Log error but don't fail the request
+                System.err.println("Error sending notification: " + e.getMessage());
+            }
+        }
+        // -----------------------------
+
+        return toDTO(savedEntity);
     }
 
     @Transactional

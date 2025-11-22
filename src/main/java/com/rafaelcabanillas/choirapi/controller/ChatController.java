@@ -4,6 +4,7 @@ import com.rafaelcabanillas.choirapi.dto.ChatMessageDTO;
 import com.rafaelcabanillas.choirapi.dto.NewMessageDTO;
 import com.rafaelcabanillas.choirapi.service.ChatService;
 import com.rafaelcabanillas.choirapi.service.CloudinaryService;
+import com.rafaelcabanillas.choirapi.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,6 +23,7 @@ public class ChatController {
 
     private final ChatService chatService;
     private final CloudinaryService cloudinaryService;
+    private final NotificationService notificationService;
 
     // --- REST Endpoints (HTTP) ---
 
@@ -42,11 +44,27 @@ public class ChatController {
 
     // --- WebSocket Endpoints (Real-Time) ---
 
-    @MessageMapping("/chat.sendMessage") // Client sends to /app/chat.sendMessage
-    @SendTo("/topic/public")             // Server pushes to /topic/public
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
     public ChatMessageDTO sendMessage(@Payload NewMessageDTO chatMessage) {
         // 1. Save to DB
-        return chatService.saveMessage(chatMessage);
-        // 2. Return value is automatically pushed to all subscribers of /topic/public
+        ChatMessageDTO savedMsg = chatService.saveMessage(chatMessage);
+
+        // 2. --- NOTIFICATION TRIGGER ---
+        try {
+            // Extract a simple preview of the text
+            String preview = "Envió un archivo/imagen";
+            // (You can implement logic here to extract text from JSON content if you want)
+
+            notificationService.sendChatNotification(
+                    savedMsg.getAuthor().getName(), // "Rafael sent..."
+                    "Nuevo mensaje en el chat"      // Body
+            );
+        } catch (Exception e) {
+            System.err.println("Error sending chat notification: " + e.getMessage());
+        }
+        // -----------------------------
+
+        return savedMsg;
     }
 }

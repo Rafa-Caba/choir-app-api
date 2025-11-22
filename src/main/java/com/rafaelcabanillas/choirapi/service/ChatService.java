@@ -12,8 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,9 +40,15 @@ public class ChatService {
         User author = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        ChatMessage parent = null;
+        if (dto.getReplyToId() != null) {
+            parent = chatRepository.findById(dto.getReplyToId()).orElse(null);
+        }
+
         ChatMessage message = ChatMessage.builder()
                 .author(author)
                 .content(dto.getContent())
+                .replyTo(parent)
                 .type(dto.getType())
                 .fileUrl(dto.getFileUrl())
                 .filename(dto.getFilename())
@@ -52,6 +60,29 @@ public class ChatService {
     }
 
     private ChatMessageDTO toDTO(ChatMessage msg) {
+        ChatMessageDTO.ReplyPreviewDTO replyPreview = null;
+        if (msg.getReplyTo() != null) {
+            // Helper to extract text from the JSON Map (Simplified logic)
+            String rawText = "Multimedia/Rich Text";
+            try {
+                // Assuming standard Tiptap structure: content[0].content[0].text
+                // You can make this robust based on your JSON structure
+                List<Map<String, Object>> contentList = (List) msg.getReplyTo().getContent().get("content");
+                if (contentList != null && !contentList.isEmpty()) {
+                    List<Map<String, Object>> innerList = (List) contentList.get(0).get("content");
+                    if (innerList != null && !innerList.isEmpty()) {
+                        rawText = (String) innerList.get(0).get("text");
+                    }
+                }
+            } catch (Exception e) { /* Ignore parse error */ }
+
+            replyPreview = ChatMessageDTO.ReplyPreviewDTO.builder()
+                    .id(msg.getReplyTo().getId())
+                    .username(msg.getReplyTo().getAuthor().getName())
+                    .textPreview(rawText)
+                    .build();
+        }
+
         return ChatMessageDTO.builder()
                 .id(msg.getId())
                 .author(UserDTO.fromEntity(msg.getAuthor()))
@@ -67,6 +98,7 @@ public class ChatService {
                                 .username(r.getUsername())
                                 .build())
                         .collect(Collectors.toList()))
+                .replyTo(replyPreview)
                 .build();
     }
 }

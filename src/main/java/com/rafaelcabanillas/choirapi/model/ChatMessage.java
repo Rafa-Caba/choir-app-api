@@ -58,4 +58,8 @@ public class ChatMessage {
         private String emoji;
         private String username; // Storing username is simpler than full relation for reactions
     }
+
+    @ManyToOne
+    @JoinColumn(name = "reply_to_id")
+    private ChatMessage replyTo;
 }

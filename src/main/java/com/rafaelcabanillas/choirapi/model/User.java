@@ -38,6 +38,8 @@ public class User {
     @Builder.Default
     private Role role = Role.USER;
 
+    private String pushToken;
+
     // --- New Choir Specific Fields ---
 
     @Column(nullable = false)

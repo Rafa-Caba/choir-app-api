@@ -44,6 +44,10 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         // Swagger / OpenAPI (Optional, useful for dev)
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/themes").permitAll()
+
                         // All other requests need authentication
                         .anyRequest().authenticated()
                 )
