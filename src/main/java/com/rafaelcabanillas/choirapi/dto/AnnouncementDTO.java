@@ -1,5 +1,6 @@
 package com.rafaelcabanillas.choirapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,9 @@ public class AnnouncementDTO {
     private String title;
     private Map<String, Object> content; // Rich Text
     private String imageUrl;
+
+    @JsonProperty("isPublic")
     private boolean isPublic;
+
     private OffsetDateTime createdAt;
 }
