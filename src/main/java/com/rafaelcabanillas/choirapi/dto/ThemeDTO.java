@@ -18,4 +18,8 @@ public class ThemeDTO {
     private String cardColor;
     private String buttonColor;
     private String navColor;
+
+    private String buttonTextColor;
+    private String secondaryTextColor;
+    private String borderColor;
 }

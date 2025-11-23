@@ -56,6 +56,9 @@ public class ThemeService {
         theme.setCardColor(dto.getCardColor());
         theme.setButtonColor(dto.getButtonColor());
         theme.setNavColor(dto.getNavColor());
+        theme.setButtonTextColor(dto.getButtonTextColor());
+        theme.setSecondaryTextColor(dto.getSecondaryTextColor());
+        theme.setBorderColor(dto.getBorderColor());
 
         return toDTO(themeRepository.save(theme));
     }
@@ -72,6 +75,9 @@ public class ThemeService {
                 .cardColor(t.getCardColor())
                 .buttonColor(t.getButtonColor())
                 .navColor(t.getNavColor())
+                .buttonTextColor(t.getButtonTextColor())
+                .secondaryTextColor(t.getSecondaryTextColor())
+                .borderColor(t.getBorderColor())
                 .build();
     }
 }

@@ -33,3 +33,11 @@ cloudinary:
 # Server Port (Optional, default is 8080)
 server:
   port: 8080
+
+jwt:
+  # Secret key (keep this matching your env var or use a default for dev)
+  secret: ${JWT_SECRET:very-strong-secret-key-for-jwt-signing-must-be-at-least-32-bytes}
+  # Expiration in milliseconds (604800000 ms = 7 days)
+  expiration: 604800000
+  # Refresh token expiration (usually longer, e.g., 14 days)
+  refresh-expiration: 1209600000

@@ -31,7 +31,7 @@ public class ThemeController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/themes/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ThemeDTO> updateTheme(
             @PathVariable Long id,
