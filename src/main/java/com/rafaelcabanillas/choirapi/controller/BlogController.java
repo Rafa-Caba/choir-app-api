@@ -1,5 +1,6 @@
 package com.rafaelcabanillas.choirapi.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelcabanillas.choirapi.dto.BlogPostDTO;
 import com.rafaelcabanillas.choirapi.service.BlogService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class BlogController {
 
     private final BlogService blogService;
+    private final ObjectMapper objectMapper;
 
     // Public Read
     @GetMapping
@@ -40,9 +42,10 @@ public class BlogController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<BlogPostDTO> create(
-            @RequestPart("data") BlogPostDTO dto,
+            @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
+        BlogPostDTO dto = objectMapper.readValue(dataJson, BlogPostDTO.class);
         return ResponseEntity.ok(blogService.create(dto.getTitle(), dto.getContent(), dto.isPublic(), file));
     }
 
@@ -50,9 +53,10 @@ public class BlogController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<BlogPostDTO> update(
             @PathVariable Long id,
-            @RequestPart("data") BlogPostDTO dto,
+            @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
+        BlogPostDTO dto = objectMapper.readValue(dataJson, BlogPostDTO.class);
         return ResponseEntity.ok(blogService.update(id, dto.getTitle(), dto.getContent(), dto.isPublic(), file));
     }
 
@@ -63,7 +67,7 @@ public class BlogController {
         return ResponseEntity.noContent().build();
     }
 
-    // Interactions (Any logged-in user)
+    // Interactions
     @PostMapping("/{id}/like")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BlogPostDTO> toggleLike(@PathVariable Long id) {
@@ -73,7 +77,6 @@ public class BlogController {
     @PostMapping("/{id}/comment")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BlogPostDTO> addComment(@PathVariable Long id, @RequestBody Map<String, Object> text) {
-        // Expecting: { "type": "doc", "content": [...] }
         return ResponseEntity.ok(blogService.addComment(id, text));
     }
 }

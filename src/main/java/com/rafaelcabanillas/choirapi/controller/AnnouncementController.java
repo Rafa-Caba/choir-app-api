@@ -1,5 +1,6 @@
 package com.rafaelcabanillas.choirapi.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelcabanillas.choirapi.dto.AnnouncementDTO;
 import com.rafaelcabanillas.choirapi.service.AnnouncementService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class AnnouncementController {
 
     private final AnnouncementService service;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<List<AnnouncementDTO>> getPublic() {
@@ -32,9 +34,11 @@ public class AnnouncementController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<AnnouncementDTO> create(
-            @RequestPart("data") AnnouncementDTO dto,
+            @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
+        // Manual parsing to bypass strict Proxy checks
+        AnnouncementDTO dto = objectMapper.readValue(dataJson, AnnouncementDTO.class);
         return ResponseEntity.ok(service.create(dto.getTitle(), dto.getContent(), dto.isPublic(), file));
     }
 
@@ -42,9 +46,10 @@ public class AnnouncementController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<AnnouncementDTO> update(
             @PathVariable Long id,
-            @RequestPart("data") AnnouncementDTO dto,
+            @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
+        AnnouncementDTO dto = objectMapper.readValue(dataJson, AnnouncementDTO.class);
         return ResponseEntity.ok(service.update(id, dto.getTitle(), dto.getContent(), dto.isPublic(), file));
     }
 

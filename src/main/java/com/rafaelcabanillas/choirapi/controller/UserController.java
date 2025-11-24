@@ -1,10 +1,12 @@
 package com.rafaelcabanillas.choirapi.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelcabanillas.choirapi.dto.UpdateUserRequest;
 import com.rafaelcabanillas.choirapi.dto.UserDTO;
 import com.rafaelcabanillas.choirapi.service.NotificationService;
 import com.rafaelcabanillas.choirapi.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +23,8 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final NotificationService notificationService; // Inject this
+    private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMyProfile() {
@@ -33,11 +36,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PutMapping("/me")
+    @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDTO> updateMyProfile(
-            @RequestPart("data") UpdateUserRequest request,
+            @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
+        UpdateUserRequest request = objectMapper.readValue(dataJson, UpdateUserRequest.class);
         return ResponseEntity.ok(userService.updateMyProfile(request, file));
     }
 
@@ -47,15 +51,17 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody UpdateUserRequest request
     ) {
+        // NOTE: This assumes standard JSON. If Frontend sends FormData here, change to @RequestPart String.
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> createUser(
-            @RequestPart("user") UpdateUserRequest request,
+            @RequestPart("user") String dataJson,
             @RequestPart(value = "image", required = false) MultipartFile file
     ) throws IOException {
+        UpdateUserRequest request = objectMapper.readValue(dataJson, UpdateUserRequest.class);
         return ResponseEntity.ok(userService.createUser(request, file));
     }
 
