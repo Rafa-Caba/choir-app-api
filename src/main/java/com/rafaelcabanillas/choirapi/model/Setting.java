@@ -32,6 +32,9 @@ public class Setting {
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> aboutApp;
 
+    private String appLogoUrl;
+    private String appLogoPublicId;
+
     @Builder.Default
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 

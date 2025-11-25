@@ -25,15 +25,14 @@ public class SettingController {
         return ResponseEntity.ok(settingService.getSettings());
     }
 
+    // FIX: Multipart support for Logo upload
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<SettingDTO> updateSettings(
-            @RequestPart("data") String dataJson, // <--- Fix
+            @RequestPart("data") String settingsJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
-        SettingDTO dto = objectMapper.readValue(dataJson, SettingDTO.class);
-        // We ignore 'file' for now as service.updateSettings only takes DTO,
-        // but accepting it prevents 415 errors if the frontend sends it.
-        return ResponseEntity.ok(settingService.updateSettings(dto));
+        SettingDTO dto = objectMapper.readValue(settingsJson, SettingDTO.class);
+        return ResponseEntity.ok(settingService.updateSettings(dto, file));
     }
 }

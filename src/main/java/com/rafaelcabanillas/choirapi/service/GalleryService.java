@@ -64,6 +64,45 @@ public class GalleryService {
     }
 
     @Transactional
+    public GalleryDTO updateImageFlags(Long id, Map<String, Boolean> flags) {
+        ImageGallery image = galleryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        // Handle "Single Instance" flags (Mutual Exclusivity)
+        if (Boolean.TRUE.equals(flags.get("imageStart"))) {
+            galleryRepository.clearImageStart();
+            image.setImageStart(true);
+        }
+        if (Boolean.TRUE.equals(flags.get("imageTopBar"))) {
+            galleryRepository.clearImageTopBar();
+            image.setImageTopBar(true);
+        }
+        if (Boolean.TRUE.equals(flags.get("imageUs"))) {
+            galleryRepository.clearImageUs();
+            image.setImageUs(true);
+        }
+        if (Boolean.TRUE.equals(flags.get("imageLogo"))) {
+            galleryRepository.clearImageLogo();
+            image.setImageLogo(true);
+        }
+
+        // Handle "Multiple Instance" flags (Toggle)
+        if (flags.containsKey("imageGallery")) {
+            image.setImageGallery(flags.get("imageGallery"));
+        }
+
+        // Handle Turning OFF single flags (if user unchecks the box)
+        // Note: Usually we enforce one MUST be selected, but if you allow
+        // having NO logo, you need this logic:
+        if (Boolean.FALSE.equals(flags.get("imageStart"))) image.setImageStart(false);
+        if (Boolean.FALSE.equals(flags.get("imageTopBar"))) image.setImageTopBar(false);
+        if (Boolean.FALSE.equals(flags.get("imageUs"))) image.setImageUs(false);
+        if (Boolean.FALSE.equals(flags.get("imageLogo"))) image.setImageLogo(false);
+
+        return toDTO(galleryRepository.save(image));
+    }
+
+    @Transactional
     public void deleteImage(Long id) throws IOException {
         ImageGallery image = galleryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));

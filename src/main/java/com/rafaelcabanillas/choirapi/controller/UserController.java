@@ -45,13 +45,15 @@ public class UserController {
         return ResponseEntity.ok(userService.updateMyProfile(request, file));
     }
 
-    @PutMapping("/{id}")
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long id,
-            @RequestBody UpdateUserRequest request
-    ) {
-        // NOTE: This assumes standard JSON. If Frontend sends FormData here, change to @RequestPart String.
+            @RequestPart("user") String dataJson,
+            @RequestPart(value = "image", required = false) MultipartFile file
+    ) throws IOException {
+        UpdateUserRequest request = objectMapper.readValue(dataJson, UpdateUserRequest.class);
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 

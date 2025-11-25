@@ -9,7 +9,8 @@ import java.util.Map;
 public class SettingDTO {
     private String appTitle;
     private SocialLinksDTO socialLinks;
-    private Map<String, Object> aboutApp; // Rich Text JSON
+    private Map<String, Object> aboutApp;
+    private String appLogoUrl;
 
     @Data
     @Builder

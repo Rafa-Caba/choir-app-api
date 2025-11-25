@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/gallery")
@@ -36,6 +37,15 @@ public class GalleryController {
             @RequestParam(value = "imageGallery", defaultValue = "true") boolean gallery
     ) throws IOException {
         return ResponseEntity.ok(galleryService.uploadImage(title, description, file, start, topBar, us, logo, gallery));
+    }
+
+    @PutMapping("/{id}/flags")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    public ResponseEntity<GalleryDTO> updateFlags(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> flags
+    ) {
+        return ResponseEntity.ok(galleryService.updateImageFlags(id, flags));
     }
 
     @DeleteMapping("/{id}")
