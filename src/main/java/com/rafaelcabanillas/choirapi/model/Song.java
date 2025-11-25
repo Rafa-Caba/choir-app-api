@@ -31,6 +31,9 @@ public class Song {
     private String type; // Generic string type or relation?
     private String composer;
 
+    private String audioUrl;
+    private String audioPublicId;
+
     @ManyToOne
     @JoinColumn(name = "song_type_id")
     private SongType songType;

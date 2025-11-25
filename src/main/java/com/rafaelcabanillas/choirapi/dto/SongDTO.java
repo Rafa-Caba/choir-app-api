@@ -16,4 +16,5 @@ public class SongDTO {
 
     private Long songTypeId;
     private String songTypeName;
+    private String audioUrl;
 }

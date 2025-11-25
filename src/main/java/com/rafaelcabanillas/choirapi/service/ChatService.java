@@ -54,6 +54,8 @@ public class ChatService {
                 .filename(dto.getFilename())
                 .imageUrl(dto.getImageUrl())
                 .imagePublicId(dto.getImagePublicId())
+                .audioUrl(dto.getAudioUrl())
+                .audioPublicId(dto.getAudioPublicId())
                 .build();
 
         return toDTO(chatRepository.save(message));
@@ -91,6 +93,7 @@ public class ChatService {
                 .fileUrl(msg.getFileUrl())
                 .filename(msg.getFilename())
                 .imageUrl(msg.getImageUrl())
+                .audioUrl(msg.getAudioUrl())
                 .createdAt(msg.getCreatedAt())
                 .reactions(msg.getReactions().stream()
                         .map(r -> ChatMessageDTO.ReactionDTO.builder()

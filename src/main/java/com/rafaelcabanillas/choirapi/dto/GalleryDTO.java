@@ -1,5 +1,6 @@
 package com.rafaelcabanillas.choirapi.dto;
 
+import com.rafaelcabanillas.choirapi.model.MediaType;
 import lombok.Builder;
 import lombok.Data;
 import java.time.OffsetDateTime;
@@ -11,6 +12,7 @@ public class GalleryDTO {
     private String title;
     private String description;
     private String imageUrl;
+    private MediaType mediaType;
     private boolean imageStart;
     private boolean imageTopBar;
     private boolean imageUs;

@@ -1,0 +1,2 @@
+ALTER TABLE gallery_images
+ADD COLUMN media_type VARCHAR(20) DEFAULT 'IMAGE';

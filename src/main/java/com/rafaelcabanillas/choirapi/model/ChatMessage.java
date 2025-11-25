@@ -39,6 +39,9 @@ public class ChatMessage {
     private String imageUrl;
     private String imagePublicId;
 
+    private String audioUrl;
+    private String audioPublicId;
+
     // Reactions (e.g., "👍" from "rafacaba")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "chat_reactions", joinColumns = @JoinColumn(name = "message_id"))

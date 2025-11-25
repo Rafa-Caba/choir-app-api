@@ -22,12 +22,17 @@ public class ImageGallery {
     private String imageUrl;
     private String imagePublicId;
 
+    // --- NEW FIELD ---
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private MediaType mediaType = MediaType.IMAGE;
+
     // --- Feature Flags ---
     @Builder.Default private boolean imageStart = false;
     @Builder.Default private boolean imageTopBar = false;
     @Builder.Default private boolean imageUs = false;
     @Builder.Default private boolean imageLogo = false;
-    @Builder.Default private boolean imageGallery = true; // Default is just a normal gallery image
+    @Builder.Default private boolean imageGallery = true;
 
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();

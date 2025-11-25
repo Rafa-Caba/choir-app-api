@@ -2,6 +2,7 @@ package com.rafaelcabanillas.choirapi.service;
 
 import com.rafaelcabanillas.choirapi.dto.GalleryDTO;
 import com.rafaelcabanillas.choirapi.model.ImageGallery;
+import com.rafaelcabanillas.choirapi.model.MediaType;
 import com.rafaelcabanillas.choirapi.repository.GalleryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,17 +31,28 @@ public class GalleryService {
     public GalleryDTO uploadImage(String title, String description, MultipartFile file,
                                   boolean start, boolean topBar, boolean us, boolean logo, boolean gallery) throws IOException {
 
-        // 1. Upload to Cloudinary
-        Map result = cloudinaryService.uploadFile(file, "choir/gallery");
+        // 1. Determine Type
+        MediaType type = MediaType.IMAGE;
+        String contentType = file.getContentType();
+        if (contentType != null && contentType.startsWith("video")) {
+            type = MediaType.VIDEO;
+        }
+
+        // 2. Upload to Cloudinary (Ensure CloudinaryService uses "resource_type", "auto")
+        // Use a specific folder for videos if you want, or keep it shared
+        String folder = type == MediaType.VIDEO ? "choir/gallery_videos" : "choir/gallery";
+        Map result = cloudinaryService.uploadFile(file, folder);
+
         String url = (String) result.get("secure_url");
         String publicId = (String) result.get("public_id");
 
-        // 2. Save to DB
+        // 3. Save to DB
         ImageGallery image = ImageGallery.builder()
                 .title(title)
                 .description(description)
                 .imageUrl(url)
                 .imagePublicId(publicId)
+                .mediaType(type) // Save type
                 .imageStart(start)
                 .imageTopBar(topBar)
                 .imageUs(us)
@@ -68,6 +80,7 @@ public class GalleryService {
                 .title(img.getTitle())
                 .description(img.getDescription())
                 .imageUrl(img.getImageUrl())
+                .mediaType(img.getMediaType()) // Map type
                 .imageStart(img.isImageStart())
                 .imageTopBar(img.isImageTopBar())
                 .imageUs(img.isImageUs())

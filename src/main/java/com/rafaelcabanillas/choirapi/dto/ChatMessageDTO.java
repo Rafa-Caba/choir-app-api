@@ -17,6 +17,7 @@ public class ChatMessageDTO {
     private String fileUrl;
     private String filename;
     private String imageUrl;
+    private String audioUrl;
     private List<ReactionDTO> reactions;
     private OffsetDateTime createdAt;
     private ReplyPreviewDTO replyTo;
